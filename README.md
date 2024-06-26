@@ -2,7 +2,9 @@
 
 This Python package provides tools for analyzing GitHub repositories, including fetching README files, repository structure, and non-binary file contents. It also generates structured outputs with pre-formatted prompts to guide further analysis of the repository's content.
 
-![alt text](logo.svg)
+<p align="center">
+  <img src="logo.svg" alt="GitHub Repository Analyzer" width="100" height="100">
+</p>
 
 ## Features
 
