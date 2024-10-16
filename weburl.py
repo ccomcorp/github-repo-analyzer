@@ -49,6 +49,14 @@ if response.status_code == 200:
         if raw_response.status_code == 200:
             readme_content = raw_response.text
 
+            # Generate tags
+            print("Generating tags for README content...")
+            tags = generate_tags(readme_content)
+
+            # Append tags to readme_content
+            readme_content += "\n\n## Generated Tags\n"
+            readme_content += ", ".join(tags)
+
             # Function to create WebLink in Capacities
             def create_weblink_in_capacities(url, title, content):
                 headers = {
@@ -84,14 +92,15 @@ if response.status_code == 200:
             else:
                 print("Failed to publish README.md to Capacities.io")
 
-            # Save the README content to a local file in the Docs directory
+            # Save the README content with tags to a local file in the Docs directory
             docs_dir = "Docs"
             os.makedirs(docs_dir, exist_ok=True)
             file_name = os.path.join(docs_dir, f"{repo}_README.md")
             with open(file_name, 'w', encoding='utf-8') as f:
                 f.write(readme_content)
 
-            print(f"README.md content saved to {file_name}")
+            print(f"README.md content with tags saved to {file_name}")
+            print(f"Generated tags: {', '.join(tags)}")
         else:
             print(f"Failed to download README.md from the download URL. Status code: {raw_response.status_code}")
     else:
