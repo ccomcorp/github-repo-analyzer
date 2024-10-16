@@ -1,1 +1,9 @@
 requests==2.31.0
+certifi==2024.8.30
+charset-normalizer==3.4.0
+-e git+https://github.com/waveupHQ/github-repo-analyzer@99f9799df38a221b5c8d4a0012b62526a2857268#egg=github_repo_analyzer
+idna==3.10
+python-dotenv==1.0.1
+requests==2.31.0
+urllib3==2.2.3
+
