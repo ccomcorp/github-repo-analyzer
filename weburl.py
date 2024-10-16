@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+import openai
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -17,6 +18,25 @@ if not github_token:
 if not CAPACITIES_API_KEY or not SPACE_ID:
     print("Error: CAPACITIES_API_KEY or SPACE_ID not found in environment variables.")
     exit(1)
+
+# Set up OpenAI API key
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
+def generate_tags(content):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that generates tags."},
+                {"role": "user", "content": f"Generate 5 relevant tags for the following content:\n\n{content}"}
+            ],
+            max_tokens=50
+        )
+        tags = response.choices[0].message['content'].strip().split(',')
+        return [tag.strip() for tag in tags]
+    except Exception as e:
+        print(f"Error generating tags: {e}")
+        return []
 
 # Ask for the owner and wait for the input
 owner = input("Who's the owner of the repo at hand? (Press <Enter> after typing) ")
