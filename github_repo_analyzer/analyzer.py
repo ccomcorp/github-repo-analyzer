@@ -1,6 +1,7 @@
 import requests
 import base64
 import json
+import os
 from typing import List, Dict, Any
 from .utils import traverse_tree, is_binary_file
 
@@ -103,7 +104,9 @@ class GitHubRepoAnalyzer:
         This provides a comprehensive view of the repository's textual content in a single file.
         """
         if output_file is None:
-            output_file = f"{self.repo}_contents.txt"
+            docs_dir = "Docs"
+            os.makedirs(docs_dir, exist_ok=True)
+            output_file = os.path.join(docs_dir, f"{self.repo}_contents.txt")
         
         with open(output_file, 'w', encoding='utf-8') as f:
             f.write(f"Contents of repository: {self.owner}/{self.repo}\n\n")

@@ -1,4 +1,5 @@
 import os
+
 import requests
 from dotenv import load_dotenv
 
@@ -41,8 +42,12 @@ if response.status_code == 200:
         raw_response = requests.get(download_url)
 
         if raw_response.status_code == 200:
-            # Save the README content to a local text file
-            file_name = f"{repo}_README.md"
+            # Create the Docs directory if it doesn't exist
+            docs_dir = "Docs"
+            os.makedirs(docs_dir, exist_ok=True)
+
+            # Save the README content to a local text file in the Docs directory
+            file_name = os.path.join(docs_dir, f"{repo}_README.md")
             with open(file_name, 'w', encoding='utf-8') as f:
                 f.write(raw_response.text)
 
