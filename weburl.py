@@ -1,16 +1,21 @@
 import os
-
 import requests
 from dotenv import load_dotenv
 
 # Load environment variables from the .env file
 load_dotenv()
 
-# Load GitHub token from environment variable
+# Load GitHub token and Capacities.io credentials from environment variables
 github_token = os.getenv('GITHUB_TOKEN')
+CAPACITIES_API_KEY = os.getenv('CAPACITIES_API_KEY')
+SPACE_ID = os.getenv('SPACE_ID')
 
 if not github_token:
     print("Error: GitHub token not found in environment variables.")
+    exit(1)
+
+if not CAPACITIES_API_KEY or not SPACE_ID:
+    print("Error: CAPACITIES_API_KEY or SPACE_ID not found in environment variables.")
     exit(1)
 
 # Ask for the owner and wait for the input
@@ -42,14 +47,49 @@ if response.status_code == 200:
         raw_response = requests.get(download_url)
 
         if raw_response.status_code == 200:
-            # Create the Docs directory if it doesn't exist
+            readme_content = raw_response.text
+
+            # Function to create WebLink in Capacities
+            def create_weblink_in_capacities(url, title, content):
+                headers = {
+                    "Authorization": f"Bearer {CAPACITIES_API_KEY}",
+                    "Content-Type": "application/json",
+                    "accept": "application/json"
+                }
+                
+                data = {
+                    "spaceId": SPACE_ID,
+                    "url": url,
+                    "titleOverwrite": title,
+                    "descriptionOverwrite": "GitHub README.md",
+                    "mdText": content
+                }
+                
+                response = requests.post("https://api.capacities.io/save-weblink", headers=headers, json=data)
+                
+                if response.status_code == 200:
+                    print("Successfully created WebLink in Capacities")
+                    return response.json()
+                else:
+                    print(f"Failed to create WebLink in Capacities. Status code: {response.status_code}")
+                    print(f"Response: {response.text}")
+                    return None
+
+            # Create WebLink in Capacities
+            repo_url = f"https://github.com/{owner}/{repo}"
+            result = create_weblink_in_capacities(repo_url, f"{owner}/{repo} README", readme_content)
+
+            if result:
+                print("README.md successfully published to Capacities.io")
+            else:
+                print("Failed to publish README.md to Capacities.io")
+
+            # Save the README content to a local file in the Docs directory
             docs_dir = "Docs"
             os.makedirs(docs_dir, exist_ok=True)
-
-            # Save the README content to a local text file in the Docs directory
             file_name = os.path.join(docs_dir, f"{repo}_README.md")
             with open(file_name, 'w', encoding='utf-8') as f:
-                f.write(raw_response.text)
+                f.write(readme_content)
 
             print(f"README.md content saved to {file_name}")
         else:
